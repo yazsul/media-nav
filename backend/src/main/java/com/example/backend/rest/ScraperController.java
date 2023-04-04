@@ -3,7 +3,7 @@ package com.example.backend.rest;
 import java.util.List;
 
 import com.example.backend.domain.Article;
-import com.example.backend.service.ScraperService;
+import com.example.backend.service.ArticleScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class ScraperController {
 
     @Autowired
-    ScraperService scraperService;
+    ArticleScraperService scraperService;
 
     @GetMapping(value="/by-author/{authorName}", produces = "application/json")
     public List<Article> searchArticlesByAuthor(@PathVariable("authorName") String authorName) {
