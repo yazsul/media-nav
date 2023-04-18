@@ -37,8 +37,7 @@ public class ScraperHelper {
         List<Map<String, String>> metaDetailsList = new ArrayList<>();
         return CompletableFuture.supplyAsync(()->{
             try {
-                Set<String> links = getAllLinksFromPage();
-                return links;
+                return getAllLinksFromPage();
             } catch (IOException e) {
                 LOGGER.error("Error in getting links.", e);
             }
@@ -90,13 +89,11 @@ public class ScraperHelper {
      * @param searchTags
      * @return
      */
-    private Set<String> searchLinkTags(Document doc, List<String> searchTags){
+    private static Set<String> searchLinkTags(Document doc, List<String> searchTags){
         Set<String> links = new HashSet<>();
         searchTags.forEach(tag->{
             Elements elems = doc.select(tag);
-            elems.forEach(e->{
-                links.add(e.select("a[href]").attr("href"));
-            });
+            elems.forEach(e-> links.add(e.select("a[href]").attr("href")));
         });
         return links;
     }

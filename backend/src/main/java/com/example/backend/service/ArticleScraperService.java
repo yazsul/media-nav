@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.example.backend.domain.Article;
-
 import java.util.stream.Collectors;
 
+import com.example.backend.domain.Article;
 import com.example.backend.util.ScraperHelper;
 import jakarta.annotation.PostConstruct;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,5 +75,25 @@ public class ArticleScraperService {
 
     public List<Article> searchArticleByDescription(String desc) {
         return articles.stream().filter(a->a.getDescription().startsWith(desc)).toList();
+    }
+
+    public List<Article> getFromCustomUrl(String url) throws IOException {
+        List<Article> content = new ArrayList<>();
+        Document document = Jsoup.connect(url).get();
+
+        // Extract the relevant elements using CSS selectors
+        // Assuming book elements have a class "book"
+        // todo send selector from front?
+        Elements elements = document.select(".book");
+
+        // Parse the elements to extract the data and create Book objects
+        for (Element element : elements) {
+            String title = element.select(".title").text();
+            String author = element.select(".author").text();
+            String price = element.select(".price").text();
+
+            content.add(new Article(title, author, price));
+        }
+        return content;
     }
 }
