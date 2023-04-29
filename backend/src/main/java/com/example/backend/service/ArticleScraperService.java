@@ -60,9 +60,7 @@ public class ArticleScraperService {
     }
 
     public List<String> listAuthors() {
-        return articles.stream().map(Article::getAuthorName)
-                .distinct()
-                .collect(Collectors.toList());
+        return articles.stream().map(Article::getAuthorName).distinct().toList();
     }
 
     public List<Article> searchArticlesByAuthor(String authorName) {
@@ -81,18 +79,26 @@ public class ArticleScraperService {
         List<Article> content = new ArrayList<>();
         Document document = Jsoup.connect(url).get();
 
-        // Extract the relevant elements using CSS selectors
-        // Assuming book elements have a class "book"
-        // todo send selector from front?
-        Elements elements = document.select(".book");
+        // Get all elements on the page
+        Elements allElements = document.getAllElements();
 
         // Parse the elements to extract the data and create Book objects
-        for (Element element : elements) {
-            String title = element.select(".title").text();
-            String author = element.select(".author").text();
-            String price = element.select(".price").text();
+        for (Element element : allElements) {
+            String title = "";
+            String author = "";
+            String description = "";
 
-            content.add(new Article(title, author, price));
+            if (element.tagName().equalsIgnoreCase("title")) {
+                title = element.text();
+            } else if (element.attr("name").equalsIgnoreCase("description")) {
+                // Get the content attribute of the meta element with name="description"
+                description = element.attr("content");
+            } else if (element.attr("name").equalsIgnoreCase("author")) {
+                // Get the content attribute of the meta element with name="author"
+                author = element.attr("content");
+            }
+
+            content.add(new Article(title, author, description));
         }
         return content;
     }

@@ -18,7 +18,6 @@ public class Article implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String title;
-    private String description;
     private String authorName;
-
+    private String description;
 }
