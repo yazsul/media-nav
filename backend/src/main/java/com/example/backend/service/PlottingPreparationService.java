@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PlottingPreparationService {
-    public PlottingPreparationServiceResponse callService(PlottingPreparationServiceRequest input) {
-        String output = "Internal Service 3 output: " + input.getRequest();
-        return new PlottingPreparationServiceResponse(output);
+    public PlottingPreparationServiceResponse callService(PlottingPreparationServiceRequest request) {
+        String response = "Internal Service 3 response";
+        return new PlottingPreparationServiceResponse(response);
     }
 }
