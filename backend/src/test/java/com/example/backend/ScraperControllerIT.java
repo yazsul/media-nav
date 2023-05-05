@@ -14,20 +14,20 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class ScraperControllerIT {
+public class ScraperControllerIT {
 
     // todo fix tests (could not autowire)
 
-    /*@Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") // idea bug
+    @Autowired
     private MockMvc mockMvc;
 
     @Test
-    void testGetAtricles() throws Exception {
+    public void testGetAtriclesInvalidUrl() throws Exception {
         String url = "https://example.com"; // URL to be passed as a path variable
         // Perform a GET request to the endpoint with the URL as a path variable
         mockMvc.perform(MockMvcRequestBuilders.get("/api/articles/{url}", url))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
         // Add more assertions for the response as needed
-    }*/
+    }
 }
