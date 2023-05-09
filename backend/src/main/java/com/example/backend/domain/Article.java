@@ -17,7 +17,16 @@ public class Article implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private String content;
+
     private String title;
-    private String authorName;
-    private String description;
+
+    private String url;
+
+    private String publication;
+
+    private String author;
+
+    private String date;
+
 }
