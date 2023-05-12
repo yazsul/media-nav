@@ -1,7 +1,6 @@
 package com.example.backend.rest;
 
 import com.example.backend.communication.*;
-import com.example.backend.service.PlottingPreparationService;
 import com.example.backend.service.ScraperService;
 import com.example.backend.service.DataAnalysisService;
 import org.springframework.http.ResponseEntity;
@@ -13,27 +12,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class GatewayController {
     private final ScraperService scraperService;
     private final DataAnalysisService dataAnalysisService;
-    private final PlottingPreparationService plottingPreparationService;
 
-    public GatewayController(ScraperService scraperService, DataAnalysisService dataAnalysisService, PlottingPreparationService plottingPreparationService) {
+    public GatewayController(ScraperService scraperService, DataAnalysisService dataAnalysisService) {
         this.scraperService = scraperService;
         this.dataAnalysisService = dataAnalysisService;
-        this.plottingPreparationService = plottingPreparationService;
     }
 
     @GetMapping(value = "/someEndpoint", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequest(@RequestBody GatewayRequest gatewayRequest) {
 
-        ScraperServiceRequest scraperServiceRequest = new ScraperServiceRequest(gatewayRequest.getRequest1());
-        DataAnalysisServiceRequest dataAnalysisServiceRequest = new DataAnalysisServiceRequest(gatewayRequest.getRequest2());
-        PlottingPreparationServiceRequest plottingPreparationServiceRequest = new PlottingPreparationServiceRequest(gatewayRequest.getRequest3());
+        ScraperServiceRequest scraperServiceRequest = new ScraperServiceRequest(gatewayRequest.getRequestForScrappingService());
+        DataAnalysisServiceRequest dataAnalysisServiceRequest = new DataAnalysisServiceRequest(gatewayRequest.getRequestForDataAnalysisService());
 
-        ScraperServiceResponse response1 = scraperService.callService(scraperServiceRequest);
-        DataAnalysisServiceResponse response2 = dataAnalysisService.callService(dataAnalysisServiceRequest);
-        PlottingPreparationServiceResponse response3 = plottingPreparationService.callService(plottingPreparationServiceRequest);
+        ScraperServiceResponse scraperServiceResponse = scraperService.callService(scraperServiceRequest);
+        DataAnalysisServiceResponse dataAnalysisServiceResponse = dataAnalysisService.callService(dataAnalysisServiceRequest);
 
         // normally one response will be returned, but for testing in the prototype:
-        GatewayResponse gatewayResponse = new GatewayResponse(response1.getResponse(), response2.getResponse(), response3.getResponse());
+        GatewayResponse gatewayResponse = new GatewayResponse(scraperServiceResponse.getResponse(),
+                dataAnalysisServiceResponse.getResponse());
 
         return ResponseEntity.ok(gatewayResponse);
     }

@@ -10,7 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GatewayRequest {
-    private String request1;
-    private String request2;
-    private String request3;
+    private String requestForScrappingService;
+    private String requestForDataAnalysisService;
 }
