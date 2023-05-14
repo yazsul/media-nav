@@ -1,91 +1,53 @@
 package com.example.backend.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.example.backend.domain.Article;
-import com.example.backend.util.ScraperHelper;
-import jakarta.annotation.PostConstruct;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ArticleScraperService {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
-    private List<Article> articles = new ArrayList<>();
-
-    @Value("${newspaper.thehindu.url}")
-    private String newspaperUrl;
-
-    @Value("${newspaper.thehindu.parse.timeout.ms}")
-    Integer parseTimeoutMillis;
-
-    @Value("${newspaper.thehindu.article.authortag}")
-    String authorTagName;
-
-    @Value("${newspaper.thehindu.article.titletag}")
-    String titleTagName;
-
-    @Value("${newspaper.thehindu.article.desctag}")
-    String descTagName;
-
-    @Value("#{'${newspaper.thehindu.article.searchtags}'.split(',')}")
-    List<String> articleLinksSearchTags;
-
-    @PostConstruct
-    public void loadContents() {
-        LOGGER.info("loadContents()...start");
-        articles.clear();
-        List<String> articleDetailsSearchTags = Arrays.asList(authorTagName, titleTagName, descTagName);
-        ScraperHelper scraperHelper = new ScraperHelper(newspaperUrl, parseTimeoutMillis, articleDetailsSearchTags, articleLinksSearchTags);
-
-        LOGGER.info("Extracting article details...start");
-
-        /*scraperHelper.fetchAllLinkMetaDetailsFromPage()
-                .thenAccept(list-> list.stream().filter(map->map.get(authorTagName)!=null && map.get(authorTagName).length()>0)
-                        .forEach(map-> articles.add(new Article(map.get(titleTagName), map.get(descTagName), map.get(authorTagName)))));*/
-
-        LOGGER.info("loadContents()...completed");
-    }
-
-    public List<String> listAuthors() {
-        return articles.stream().map(Article::getAuthor).distinct().toList();
-    }
-
-    public List<Article> searchArticlesByAuthor(String authorName) {
-        return articles.stream().filter(a->a.getAuthor().equalsIgnoreCase(authorName)).toList();
-    }
-
-    public List<Article> searchArticleByTitle(String title) {
-        return articles.stream().filter(a->a.getTitle().startsWith(title)).toList();
-    }
-
-    public List<Article> searchArticleByDescription(String desc) {
-        return articles.stream().filter(a->a.getPublication().startsWith(desc)).toList();
-    }
-
-    public List<Article> getFromCustomUrl(String url) throws IOException {
-        List<Article> content = new ArrayList<>();
+    public List<Article> getArticlesFromCustomUrl(String url) throws IOException {
+        List<Article> articleList = new ArrayList<>();
         Document document = Jsoup.connect(url).get();
 
         // get article content
+        String content = getContentOfArticle(document);
+
+        // get article title
+        String title = getTitleOfArticle(document);
+
+        // get publication name
+        String publicationName = getPublicationNameOfArticle(document);
+
+        // get article author
+        String author = getAuthorOfArticle(document);
+
+        // get date of article
+        String date = getDateOfArticle(document);
+
+        articleList.add(new Article(content, title, url, publicationName, author, date));
+
+        return articleList;
+    }
+
+    private String getContentOfArticle(Document document) {
         Elements contentElements = document.select("div.article-content, article, div.blog-post");
         StringBuilder articleContent = new StringBuilder();
         for (Element el : contentElements) {
             articleContent.append(el.text()).append("\n");
         }
+        return articleContent.toString();
+    }
 
-        // get article title
+    private String getTitleOfArticle(Document document) {
         String title = document.title();
         // If title is empty, select specific elements that contain the article's title
         if (title.isEmpty()) {
@@ -99,8 +61,10 @@ public class ArticleScraperService {
                 }
             }
         }
+        return title;
+    }
 
-        // get publication name
+    private String getPublicationNameOfArticle(Document document) {
         Elements publicationElements = document.select("meta[property='og:site_name'], meta[name='og:site_name'], "
                 + "meta[property='og:article:publisher'], meta[name='og:article:publisher'], meta[property='og:site_name']");
         String publicationName = "";
@@ -110,8 +74,10 @@ public class ArticleScraperService {
                 break;
             }
         }
+        return publicationName;
+    }
 
-        // get article author
+    private String getAuthorOfArticle(Document document) {
         Elements authorElements = document.select("span.author, div.author, meta[name='author'], meta[property='author'],"
                 + "span.byline-author-name");
         // Extract the author from the elements
@@ -122,8 +88,10 @@ public class ArticleScraperService {
                 break;
             }
         }
+        return author;
+    }
 
-        // get date of article
+    private String getDateOfArticle(Document document) {
         Elements dateElements = document.select("time, span.date, span.time, div.date, div.time, "
                 + "meta[property='article:published_time'], meta[property='og:article:published_time']");
         // Extract the date from the elements
@@ -138,9 +106,6 @@ public class ArticleScraperService {
                 break;
             }
         }
-
-        content.add(new Article(articleContent.toString(), title, url, publicationName, author, date));
-
-        return content;
+        return date;
     }
 }
