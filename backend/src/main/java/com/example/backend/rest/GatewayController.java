@@ -1,7 +1,12 @@
 package com.example.backend.rest;
 
-import com.example.backend.communication.*;
-import com.example.backend.service.ScraperService;
+import java.io.IOException;
+
+import com.example.backend.communication.GatewayRequest;
+import com.example.backend.communication.GatewayResponse;
+import com.example.backend.communication.ScraperServiceRequest;
+import com.example.backend.domain.Article;
+import com.example.backend.service.ArticleScraperService;
 import com.example.backend.service.DataAnalysisService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,27 +15,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class GatewayController {
-    private final ScraperService scraperService;
+
+    private final ArticleScraperService articleScraperService;
     private final DataAnalysisService dataAnalysisService;
 
-    public GatewayController(ScraperService scraperService, DataAnalysisService dataAnalysisService) {
-        this.scraperService = scraperService;
+    public GatewayController(ArticleScraperService articleScraperService, DataAnalysisService dataAnalysisService) {
+        this.articleScraperService = articleScraperService;
         this.dataAnalysisService = dataAnalysisService;
     }
 
-    @GetMapping(value = "/someEndpoint", consumes = {"application/json"}, produces = "application/json")
-    public ResponseEntity<GatewayResponse> handleRequest(@RequestBody GatewayRequest gatewayRequest) {
-
+    @GetMapping(value = "/call-scraping-service", consumes = {"application/json"}, produces = "application/json")
+    public ResponseEntity<GatewayResponse> handleRequestToScrapingService(@RequestBody GatewayRequest gatewayRequest) throws IOException {
+        // send an url in request to service
         ScraperServiceRequest scraperServiceRequest = new ScraperServiceRequest(gatewayRequest.getRequestForScrappingService());
-        DataAnalysisServiceRequest dataAnalysisServiceRequest = new DataAnalysisServiceRequest(gatewayRequest.getRequestForDataAnalysisService());
-
-        ScraperServiceResponse scraperServiceResponse = scraperService.callService(scraperServiceRequest);
-        DataAnalysisServiceResponse dataAnalysisServiceResponse = dataAnalysisService.callService(dataAnalysisServiceRequest);
-
+        // response
+        Article responseFromScrapingService = articleScraperService.getArticleFromCustomUrl(scraperServiceRequest.getRequest());
         // normally one response will be returned, but for testing in the prototype:
-        GatewayResponse gatewayResponse = new GatewayResponse(scraperServiceResponse.getResponse(),
-                dataAnalysisServiceResponse.getResponse());
+        GatewayResponse gatewayResponse = new GatewayResponse(responseFromScrapingService.toString(), "");
 
         return ResponseEntity.ok(gatewayResponse);
     }
+
 }
