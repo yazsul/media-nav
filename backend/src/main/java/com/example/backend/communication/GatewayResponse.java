@@ -12,5 +12,4 @@ import lombok.Setter;
 public class GatewayResponse {
     private String response1;
     private String response2;
-    private String response3;
 }
