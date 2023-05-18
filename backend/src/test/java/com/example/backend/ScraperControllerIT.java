@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -32,9 +34,16 @@ public class ScraperControllerIT {
     public void testGetAtriclesInvalidUrl() throws Exception {
         String url = "https://example.com"; // URL to be passed as a path variable
         // Perform a GET request to the endpoint with the URL as a path variable
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/articles/from-url?url="+url))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/articles/from-url?url="+url))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
         // Add more assertions for the response as needed
+        String response = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Article article = objectMapper.readValue(response, new TypeReference<>(){});
+
+        assertEquals("", article.getContent());
     }
 
     @Test
@@ -48,8 +57,8 @@ public class ScraperControllerIT {
         String response = mvcResult.getResponse().getContentAsString();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<Article> article = objectMapper.readValue(response, new TypeReference<>(){});
+        Article article = objectMapper.readValue(response, new TypeReference<>(){});
 
-        assertNotNull(article.get(0));
+        assertNotNull(article);
     }
 }
