@@ -21,4 +21,9 @@ public class ScraperController {
     public List<Article> getArticles(@RequestParam String url) throws IOException {
         return scraperService.getArticlesFromCustomUrl(url);
     }
+
+    @GetMapping("/from-content")
+    public String sendArticleContent(@RequestParam String content) {
+        return scraperService.sendArticleContent(content);
+    }
 }
