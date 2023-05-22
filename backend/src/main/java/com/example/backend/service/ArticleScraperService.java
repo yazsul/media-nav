@@ -14,8 +14,7 @@ import java.util.List;
 @Service
 public class ArticleScraperService {
 
-    public List<Article> getArticlesFromCustomUrl(String url) throws IOException {
-        List<Article> articleList = new ArrayList<>();
+    public Article getArticleFromCustomUrl(String url) throws IOException {
         Document document = Jsoup.connect(url).get();
 
         // get article content
@@ -33,9 +32,7 @@ public class ArticleScraperService {
         // get date of article
         String date = getDateOfArticle(document);
 
-        articleList.add(new Article(content, title, url, publicationName, author, date));
-
-        return articleList;
+        return new Article(content, title, url, publicationName, author, date);
     }
 
     private String getContentOfArticle(Document document) {
