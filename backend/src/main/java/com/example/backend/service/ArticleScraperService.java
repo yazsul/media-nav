@@ -105,4 +105,8 @@ public class ArticleScraperService {
         }
         return date;
     }
+
+    public String sendArticleContent(String content) {
+        return content;
+    }
 }

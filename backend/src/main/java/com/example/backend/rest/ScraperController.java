@@ -22,6 +22,8 @@ public class ScraperController {
         return scraperService.getArticleFromCustomUrl(url);
     }
 
-    //text
-
+    @GetMapping("/from-content")
+    public String sendArticleContent(@RequestParam String content) {
+        return scraperService.sendArticleContent(content);
+    }
 }
