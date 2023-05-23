@@ -18,8 +18,8 @@ public class ScraperController {
 
     // method with custom url
     @GetMapping("/from-url")
-    public List<Article> getArticles(@RequestParam String url) throws IOException {
-        return scraperService.getArticlesFromCustomUrl(url);
+    public Article getArticle(@RequestParam String url) throws IOException {
+        return scraperService.getArticleFromCustomUrl(url);
     }
 
     @GetMapping("/from-content")
