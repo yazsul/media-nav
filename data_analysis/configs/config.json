@@ -1,0 +1,30 @@
+{
+  "BERT_TONALITY_MODEL":
+  {
+    "TOKENIZER": "cardiffnlp/twitter-roberta-base-sentiment",
+    "MODEL": "cardiffnlp/twitter-roberta-base-sentiment",
+    "TOKENIZER_LOCAL_PATH": "./data_analysis/models/cardiffnlp/twitter-roberta-base-sentiment-tokenizer",
+    "MODEL_LOCAL_PATH": "./data_analysis/models/cardiffnlp/twitter-roberta-base-sentiment-model",
+    "PRETRAINED_MODEL_PATH": "./data_analysis/models/cardiffnlp/twitter-roberta-base-sentiment-model/pytorch_model.bin",
+    "CLASS_NAMES": [
+      "negative",
+      "neutral",
+      "positive"
+    ],
+    "MAX_SEQUENCE_LEN": 512
+  },
+  "BERT_POLITICAL_MODEL":
+  {
+    "TOKENIZER": "bert-base-cased",
+    "MODEL": "bucketresearch/politicalBiasBERT",
+    "TOKENIZER_LOCAL_PATH": "./data_analysis/models/bucketresearch/politicalBiasBERT-tokenizer",
+    "MODEL_LOCAL_PATH": "./data_analysis/models/bucketresearch/politicalBiasBERT-model",
+    "PRETRAINED_MODEL_PATH": "./data_analysis/models/bucketresearch/politicalBiasBERT-model/pytorch_model.bin",
+    "CLASS_NAMES": [
+      "left",
+      "center",
+      "right"
+    ],
+    "MAX_SEQUENCE_LEN": 512
+  }
+}
