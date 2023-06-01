@@ -1,49 +1,58 @@
 package com.example.backend.service;
 
-import com.example.backend.communication.DataAnalysisServiceRequest;
-import com.example.backend.communication.DataAnalysisServiceResponse;
-import com.example.backend.util.Command;
-import com.example.backend.util.PropertiesFileParameters;
+import com.example.backend.communication.DataAnalysisServiceTonalityLeaningResponse;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @Service
 public class DataAnalysisService {
-    public DataAnalysisServiceResponse callService(DataAnalysisServiceRequest request) {
-        executeDataAnalysisMainScript();
-        String response = "Internal Service 2 response";
-        return new DataAnalysisServiceResponse(response);
+
+    public DataAnalysisServiceTonalityLeaningResponse.Probabilities predictTonalityAndLeaning(String urlString, String requestForDataAnalysisService) throws JSONException, IOException {
+        StringBuilder response = connectAndGetResponse(requestForDataAnalysisService, urlString);
+        JSONObject jsonObject = new JSONObject(response.toString());
+        return (DataAnalysisServiceTonalityLeaningResponse.Probabilities) jsonObject.get("probabilities");
     }
 
-    private void executeDataAnalysisMainScript() {
-        String response = new Command().execute(getCommandToRunDataAnalysisMainScript());
-        System.out.println(response);
+    public String getWordcloud(String urlString, String requestForDataAnalysisService) throws IOException {
+        StringBuilder response = connectAndGetResponse(requestForDataAnalysisService, urlString);
+        return response.toString();
     }
 
-    private String getDataAnalysisMainScriptAbsolutePath() {
-        String path = new File("").getAbsolutePath() + new PropertiesFileParameters().getDataAnalysisServiceMainScriptRelativePath();
-        return path;
-    }
+    private StringBuilder connectAndGetResponse(String requestForDataAnalysisService, String urlString) throws IOException {
+        HttpURLConnection connection;
+        //Create connection
+        URL url = new URL(urlString);
+        connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        connection.setRequestProperty("Content-Length", Integer.toString(requestForDataAnalysisService.getBytes().length));
+        connection.setRequestProperty("Content-Language", "en-US");
+        connection.setUseCaches(false);
+        connection.setDoOutput(true);
 
-    private String getDataAnalysisMainScriptInputDirAbsolutePath() {
-        String path = new File("").getAbsolutePath() + new PropertiesFileParameters().getDataAnalysisServiceInputRelativePath();
-        return path;
-    }
+        //Send request
+        DataOutputStream wr = new DataOutputStream (connection.getOutputStream());
+        wr.writeBytes(requestForDataAnalysisService);
+        wr.close();
 
-    private String getDataAnalysisMainScriptOutputDirAbsolutePath() {
-        String path = new File("").getAbsolutePath() + new PropertiesFileParameters().getDataAnalysisServiceOutputRelativePath();
-        return path;
-    }
+        //Get Response
+        InputStream is = connection.getInputStream();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+        StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
+        String line;
+        while ((line = rd.readLine()) != null) {
+            response.append(line);
+            response.append('\r');
+        }
+        rd.close();
 
-    private String getCommandToRunDataAnalysisMainScript() {
-        PropertiesFileParameters properties = new PropertiesFileParameters();
-        String mainScriptPath = getDataAnalysisMainScriptAbsolutePath();
-        String commandToRunDataAnalysisMainScript = "python " + mainScriptPath + " " + getDataAnalysisMainScriptInputDirAbsolutePath()
-                + " " + getDataAnalysisMainScriptOutputDirAbsolutePath();
-        return commandToRunDataAnalysisMainScript;
+        connection.disconnect();
+
+        return response;
     }
 }
