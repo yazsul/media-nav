@@ -1,4 +1,4 @@
-import json, os
+import json, os, base64
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
@@ -8,7 +8,9 @@ from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 
 from .classifiers.bert_model import BertModel,get_tonality_model,get_leaning_model
+from .wcloud import WordCloudImplementation, get_wordcloud_instance
 
+from io import BytesIO
 
 def download_models():
 
@@ -41,6 +43,11 @@ class SentimentRequest(BaseModel):
 class SentimentResponse(BaseModel):
     probabilities: Dict[str, float]
 
+class WordCloudRequest(BaseModel):
+    text: str
+
+class WordCloudResponse(BaseModel):
+    b64Img: str
 
 @app.post("/predict_tonality", response_model=SentimentResponse)
 def predict(request: SentimentRequest, model: BertModel = Depends(get_tonality_model)):
@@ -55,4 +62,13 @@ def predict(request: SentimentRequest, model: BertModel = Depends(get_leaning_mo
     probabilities = model.predict(request.text)
     return SentimentResponse(
         probabilities=probabilities
+    )
+@app.post("/wordcloud")
+def createWordCloud(request: WordCloudRequest, wc: WordCloudImplementation = Depends(get_wordcloud_instance)):
+    wcObject = wc.generate_word_cloud(request.text)
+    imgData = BytesIO()
+    wc.save_word_cloud_as_image(wcObject, imgData)
+    imgData.seek(0)
+    return WordCloudResponse(
+        b64Img=base64.b64encode(imgData.read())
     )
