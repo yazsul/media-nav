@@ -1,5 +1,8 @@
 package com.example.backend.service;
 
+import com.example.backend.rest.GatewayController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -10,21 +13,26 @@ import java.net.http.HttpRequest;
 
 @Service
 public class DataAnalysisService {
+    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisService.class);
+
     private static final String URL = "http://localhost:8000/";
     private static final String TONALITY_ENDPOINT = "predict_tonality";
     private static final String LEANING_ENDPOINT = "predict_leaning";
     private static final String WORDCLOUD_ENDPOINT = "wordcloud";
 
     public String predictTonality(String requestForDataAnalysisService) throws IOException {
+        logger.info("predictTonality is called and the following parameter is passed: " + requestForDataAnalysisService);
         return runDataAnalysisRequest(TONALITY_ENDPOINT, requestForDataAnalysisService);
     }
 
     public String predictLeaning(String requestForDataAnalysisService) throws IOException {
+        logger.info("predictLeaning is called and the following parameter is passed: " + requestForDataAnalysisService);
         return runDataAnalysisRequest(LEANING_ENDPOINT, requestForDataAnalysisService);
 
     }
 
     public String getWordCloud(String requestForDataAnalysisService) throws IOException {
+        logger.info("getWordCloud is called and the following parameter is passed: " + requestForDataAnalysisService);
         return runDataAnalysisRequest(WORDCLOUD_ENDPOINT, requestForDataAnalysisService);
     }
 
