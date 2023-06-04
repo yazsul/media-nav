@@ -1,49 +1,58 @@
 package com.example.backend.service;
 
-import com.example.backend.communication.DataAnalysisServiceRequest;
-import com.example.backend.communication.DataAnalysisServiceResponse;
-import com.example.backend.util.Command;
-import com.example.backend.util.PropertiesFileParameters;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
+import java.net.URI;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest;
 
 @Service
 public class DataAnalysisService {
-    public DataAnalysisServiceResponse callService(DataAnalysisServiceRequest request) {
-        executeDataAnalysisMainScript();
-        String response = "Internal Service 2 response";
-        return new DataAnalysisServiceResponse(response);
+    private static final String URL = "http://localhost:8000/";
+    private static final String TONALITY_ENDPOINT = "predict_tonality";
+    private static final String LEANING_ENDPOINT = "predict_leaning";
+    private static final String WORDCLOUD_ENDPOINT = "wordcloud";
+
+    public String predictTonality(String requestForDataAnalysisService) throws IOException {
+        return runDataAnalysisRequest(TONALITY_ENDPOINT, requestForDataAnalysisService);
     }
 
-    private void executeDataAnalysisMainScript() {
-        String response = new Command().execute(getCommandToRunDataAnalysisMainScript());
-        System.out.println(response);
+    public String predictLeaning(String requestForDataAnalysisService) throws IOException {
+        return runDataAnalysisRequest(LEANING_ENDPOINT, requestForDataAnalysisService);
+
     }
 
-    private String getDataAnalysisMainScriptAbsolutePath() {
-        String path = new File("").getAbsolutePath() + new PropertiesFileParameters().getDataAnalysisServiceMainScriptRelativePath();
-        return path;
+    public String getWordCloud(String requestForDataAnalysisService) throws IOException {
+        return runDataAnalysisRequest(WORDCLOUD_ENDPOINT, requestForDataAnalysisService);
     }
 
-    private String getDataAnalysisMainScriptInputDirAbsolutePath() {
-        String path = new File("").getAbsolutePath() + new PropertiesFileParameters().getDataAnalysisServiceInputRelativePath();
-        return path;
+    private String runDataAnalysisRequest(final String endpoint, final String paragraphToAnalyze){
+        HttpRequest request = buildHttpRequest(endpoint, paragraphToAnalyze);
+        HttpResponse<String> response = getHttpResponse(request);
+        return response.body();
     }
 
-    private String getDataAnalysisMainScriptOutputDirAbsolutePath() {
-        String path = new File("").getAbsolutePath() + new PropertiesFileParameters().getDataAnalysisServiceOutputRelativePath();
-        return path;
+    private HttpRequest buildHttpRequest(final String endpoint, final String paragraphToAnalyze){
+        return HttpRequest.newBuilder()
+                .uri(URI.create(URL + endpoint))
+                .method("POST", HttpRequest.BodyPublishers.ofString("{\n" +
+                        "    \"text\": \"" + paragraphToAnalyze + "\"\n" +
+                        "}"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
     }
 
-    private String getCommandToRunDataAnalysisMainScript() {
-        PropertiesFileParameters properties = new PropertiesFileParameters();
-        String mainScriptPath = getDataAnalysisMainScriptAbsolutePath();
-        String commandToRunDataAnalysisMainScript = "python " + mainScriptPath + " " + getDataAnalysisMainScriptInputDirAbsolutePath()
-                + " " + getDataAnalysisMainScriptOutputDirAbsolutePath();
-        return commandToRunDataAnalysisMainScript;
+    private HttpResponse getHttpResponse(final HttpRequest request){
+        HttpResponse<String> response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 }

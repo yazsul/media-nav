@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class Article implements Serializable {
 
     @Serial
@@ -29,4 +30,15 @@ public class Article implements Serializable {
 
     private String date;
 
+    @Override
+    public String toString() {
+        return "Article{" +
+                "content='" + content + '\'' +
+                ", title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", publication='" + publication + '\'' +
+                ", author='" + author + '\'' +
+                ", date='" + date + '\'' +
+                '}';
+    }
 }

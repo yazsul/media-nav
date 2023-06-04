@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GatewayResponse {
-    private String response1;
-    private String response2;
+    private String responseFromScrappingService;
+    private String responseFromDataAnalysisService;
 }
