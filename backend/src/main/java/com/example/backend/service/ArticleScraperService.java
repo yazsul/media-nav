@@ -5,6 +5,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,8 +15,11 @@ import java.util.List;
 
 @Service
 public class ArticleScraperService {
+    private static final Logger logger = LoggerFactory.getLogger(ArticleScraperService.class);
 
     public Article getArticleFromCustomUrl(String url) throws IOException {
+        logger.info("getArticleFromCustomUrl is called and the following parameter is passed: " + url);
+
         Document document = Jsoup.connect(url).get();
 
         // get article content
