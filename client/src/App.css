@@ -1,0 +1,18 @@
+.nav{
+  justify-content: center;
+  padding-block: 2rem;
+}
+
+.nav .nav-item{
+  color: white !important;
+  font-size: large;
+}
+
+.nav .nav-item.active{
+  text-decoration: underline;
+}
+
+.particles{
+  z-index: -1;
+  position: relative;
+}
