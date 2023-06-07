@@ -1,12 +1,13 @@
 import { Container } from "react-bootstrap";
 import { Route, Routes } from "react-router-dom";
-import "./App.css";
-import Navbar from "./components/Navbar";
-import Particles from "./components/Particles";
-import ArticleKeywords from "./pages/ArticleKeywords";
-import ArticleTonality from "./pages/ArticleTonality";
-import Home from "./pages/Home";
-import PoliticalBias from "./pages/PoliticalBias";
+import "App.css";
+import Navbar from "components/Navbar";
+import Particles from "components/Particles";
+import ArticleKeywords from "pages/ArticleKeywords";
+import ArticleTonality from "pages/ArticleTonality";
+import Home from "pages/Home";
+import PoliticalBias from "pages/PoliticalBias";
+import LocalResources from "resources/LocalResources";
 
 function App() {
   return (

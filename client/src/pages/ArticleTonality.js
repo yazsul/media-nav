@@ -4,20 +4,30 @@ import { VictoryBar, VictoryChart } from 'victory';
 import * as yup from 'yup';
 
 
-
 const ArticleTonality = () => {
   const [isLink, setIsLink] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [data, setData] = React.useState(null);
-
-  const sendToAPI = async (data) => {
-    return fetch('/artical-tonality', {
+  const backendServerURL = 'http://localhost:8080';
+  
+  const sendToAPILink = async (data) => {
+    const response = fetch(backendServerURL.concat('', '/scrape-article-and-predict-tonality'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      }, 
+      },
       body: JSON.stringify(data),
-    }).json();
+    });
+  }
+  
+  const sendToAPIText = async (data) => {
+    return fetch(backendServerURL.concat('', '/scrape-article-and-predict-tonality'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
   }
 
   const handleSubmit = async (event) => {
@@ -27,12 +37,12 @@ const ArticleTonality = () => {
       if (isLink) {
         const value = event.target.link.value;
         yup.string().url('Invalid URL').required().validateSync(value);
-        const response = await sendToAPI({ link: value });
+        const response = await sendToAPILink({ link: value });
         setData(response);
       } else {
         const value = event.target.text.value;
         yup.string().required().validateSync(value);
-        const response = await sendToAPI({ text: value });
+        const response = await sendToAPIText({ text: value });
         setData(response);
       }
     } catch (error) {
@@ -158,7 +168,7 @@ const ArticleTonality = () => {
     
           >
             <VictoryBar
-              data={_data}
+              data={data}
               x="class"
               y="rate"
               horizontal

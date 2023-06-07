@@ -7,15 +7,26 @@ const PoliticalBias = () => {
   const [isLink, setIsLink] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [data, setData] = React.useState(null);
+  const backendServerURL = 'http://localhost:8080';
 
-  const sendToAPI = async (data) => {
-    return fetch('/political-bias', {
+  const sendToAPILink = async (data) => {
+    const response = fetch(backendServerURL.concat('', '/scrape-article-and-predict-leaning'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
-    }).json();
+    });
+  }
+  
+  const sendToAPIText = async (data) => {
+    return fetch(backendServerURL.concat('', '/scrape-article-and-predict-leaning'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
   }
 
   const handleSubmit = async (event) => {
@@ -25,12 +36,12 @@ const PoliticalBias = () => {
       if (isLink) {
         const value = event.target.link.value;
         yup.string().url('Invalid URL').required().validateSync(value);
-        const response = await sendToAPI({ link: value });
+        const response = await sendToAPILink({ requestForScrappingService: value });
         setData(response);
       } else {
         const value = event.target.text.value;
         yup.string().required().validateSync(value);
-        const response = await sendToAPI({ text: value });
+        const response = await sendToAPIText({ requestForDataAnalysisService: value });
         setData(response);
       }
     } catch (error) {
