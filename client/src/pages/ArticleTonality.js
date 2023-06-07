@@ -2,32 +2,56 @@ import React, { useMemo } from 'react';
 import { Alert, Button, ButtonGroup } from 'react-bootstrap';
 import { VictoryBar, VictoryChart } from 'victory';
 import * as yup from 'yup';
+import axios from 'axios';
 
 
 const ArticleTonality = () => {
   const [isLink, setIsLink] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [data, setData] = React.useState(null);
+  
   const backendServerURL = 'http://localhost:8080';
+
+  const transformObjectToArray = (obj) => {
+    const result = [];
+    
+    for (const key in obj.probabilities) {
+      const probability = obj.probabilities[key];
+      result.push({ class: key, rate: probability });
+    }
+    
+    return result;
+  }
+  
   
   const sendToAPILink = async (data) => {
-    const response = fetch(backendServerURL.concat('', '/scrape-article-and-predict-tonality'), {
-      method: 'POST',
-      headers: {
+     axios({
+      method: 'post',
+      url: backendServerURL.concat('', '/scrape-article-and-predict-tonality'),
+      headers:{
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
-    });
+      data: data
+    }).then(response => {
+      let res = response.data;
+      const result = transformObjectToArray(res["probabilities"]);
+      setData(result) ;
+    })
   }
   
   const sendToAPIText = async (data) => {
-    return fetch(backendServerURL.concat('', '/scrape-article-and-predict-tonality'), {
-      method: 'POST',
-      headers: {
+     axios({
+      method: 'post',
+      url: backendServerURL.concat('', '/predict-tonality'),
+      headers:{
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
-    });
+      data: data
+    }).then(response => {
+      let res = response.data;
+      const result = transformObjectToArray(res["probabilities"]);
+      setData(result) ;
+    })
   }
 
   const handleSubmit = async (event) => {
@@ -37,13 +61,11 @@ const ArticleTonality = () => {
       if (isLink) {
         const value = event.target.link.value;
         yup.string().url('Invalid URL').required().validateSync(value);
-        const response = await sendToAPILink({ link: value });
-        setData(response);
+        await sendToAPILink({ link: value });
       } else {
         const value = event.target.text.value;
         yup.string().required().validateSync(value);
-        const response = await sendToAPIText({ text: value });
-        setData(response);
+        await sendToAPIText({ text: value });
       }
     } catch (error) {
       setError(error.message);
@@ -97,13 +119,8 @@ const ArticleTonality = () => {
   }, [isLink]);
 
 
-  // Here the data is hardcoded, but you need use the data from the API
-  const _data = [
-    {class: "center", rate: 0.567},
-    {class: "right", rate: 0.378},
-    {class: "left", rate: 0.054}
-  ];
-  
+
+
   return (
    <>
     <div className="Form">
@@ -156,7 +173,7 @@ const ArticleTonality = () => {
     </div>
     {
     
-      data ? null : (
+      data ? (
         <div style={{
           position: 'relative',
           zIndex: 1,
@@ -165,7 +182,6 @@ const ArticleTonality = () => {
         }}>
           <VictoryChart
             domainPadding={20}
-    
           >
             <VictoryBar
               data={data}
@@ -175,7 +191,7 @@ const ArticleTonality = () => {
             />
           </VictoryChart>
         </div>
-      )
+      ): null
     }
    </>
   );

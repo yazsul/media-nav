@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Alert, Button, ButtonGroup } from 'react-bootstrap';
 import { VictoryBar, VictoryChart } from 'victory';
 import * as yup from 'yup';
+import axios from 'axios';
 
 const PoliticalBias = () => {
   const [isLink, setIsLink] = React.useState(true);
@@ -9,25 +10,47 @@ const PoliticalBias = () => {
   const [data, setData] = React.useState(null);
   const backendServerURL = 'http://localhost:8080';
 
-  const sendToAPILink = async (data) => {
-    const response = fetch(backendServerURL.concat('', '/scrape-article-and-predict-leaning'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+  
+  const transformObjectToArray = (obj) => {
+    const result = [];
+    
+    for (const key in obj.probabilities) {
+      const probability = obj.probabilities[key];
+      result.push({ class: key, rate: probability });
+    }
+    
+    return result;
   }
   
-  const sendToAPIText = async (data) => {
-    return fetch(backendServerURL.concat('', '/scrape-article-and-predict-leaning'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-  }
+  const sendToAPILink = async (data) => {
+    axios({
+     method: 'post',
+     url: backendServerURL.concat(backendServerURL, '/scrape-article-and-predict-leaning'),
+     headers:{
+       'Content-Type': 'application/json',
+     },
+     data: data
+   }).then(response => {
+     let res = response.data;
+     const result = transformObjectToArray(res["probabilities"]);
+     setData(result) ;
+   })
+ }
+ 
+ const sendToAPIText = async (data) => {
+    axios({
+     method: 'post',
+     url: backendServerURL.concat(backendServerURL, '/predict-leaning'),
+     headers:{
+       'Content-Type': 'application/json',
+     },
+     data: data
+   }).then(response => {
+     let res = response.data;
+     const result = transformObjectToArray(res["probabilities"]);
+     setData(result) ;
+   })
+ }
 
   const handleSubmit = async (event) => {
     try {
@@ -152,27 +175,28 @@ const PoliticalBias = () => {
         </button>
       </form>
     </div>
-    {/* {white
-      // data ? ( */}
-        {/* <div style={{
-          position: 'relative',
-          zIndex: 1,
-          width: '600px',
-          color: 'white'
-        }}>
-          <VictoryChart
-            domainPadding={20}
-          >
-            <VictoryBar
-              data={_data}
-              x="class"
-              y="rate"
-              horizontal
-            />
-          </VictoryChart>
-        </div> */}
-      {/* ) : null
-    } */}
+    {
+    data ?  (
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        width: '600px',
+        color: 'white'
+      }}>
+        <VictoryChart
+          domainPadding={20}
+  
+        >
+          <VictoryBar
+            data={data}
+            x="class"
+            y="rate"
+            horizontal
+          />
+        </VictoryChart>
+      </div>
+    ) : null
+  }
    </div>
   );
 };

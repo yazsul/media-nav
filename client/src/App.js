@@ -7,7 +7,7 @@ import ArticleKeywords from "pages/ArticleKeywords";
 import ArticleTonality from "pages/ArticleTonality";
 import Home from "pages/Home";
 import PoliticalBias from "pages/PoliticalBias";
-import LocalResources from "resources/LocalResources";
+
 
 function App() {
   return (
