@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from typing import Dict
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
 from .classifiers.bert_model import BertModel,get_tonality_model,get_leaning_model
@@ -51,6 +51,8 @@ class WordCloudResponse(BaseModel):
 
 @app.post("/predict_tonality", response_model=SentimentResponse)
 def predict(request: SentimentRequest, model: BertModel = Depends(get_tonality_model)):
+    if len(request.text) == 0:
+        raise HTTPException(status_code=422, detail="Nothing to process(no request body).")
     probabilities = model.predict(request.text)
     return SentimentResponse(
         probabilities=probabilities
@@ -59,12 +61,16 @@ def predict(request: SentimentRequest, model: BertModel = Depends(get_tonality_m
 
 @app.post("/predict_leaning", response_model=SentimentResponse)
 def predict(request: SentimentRequest, model: BertModel = Depends(get_leaning_model)):
+    if len(request.text) == 0:
+        raise HTTPException(status_code=422, detail="Nothing to process(no request body).")
     probabilities = model.predict(request.text)
     return SentimentResponse(
         probabilities=probabilities
     )
 @app.post("/wordcloud")
 def createWordCloud(request: WordCloudRequest, wc: WordCloudImplementation = Depends(get_wordcloud_instance)):
+    if len(request.text) == 0:
+        raise HTTPException(status_code=422, detail="Nothing to process(no request body).")
     wcObject = wc.generate_word_cloud(request.text)
     imgData = BytesIO()
     wc.save_word_cloud_as_image(wcObject, imgData)

@@ -41,7 +41,7 @@ public class GatewayController {
     public ResponseEntity<GatewayResponse> handleRequestToTonalityEndpoint(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToTonalityEndpoint is called and the following parameter is passed: " + gatewayRequest.getRequestForDataAnalysisService());
 
-        String response = dataAnalysisService.predictTonality(gatewayRequest.getRequestForDataAnalysisService());
+        String response = dataAnalysisService.predictTonality(gatewayRequest.getRequestForDataAnalysisService().replaceAll("\\p{Cntrl}", "").replaceAll("[^a-zA-Z0-9_ -]", ""));
 
         GatewayResponse gatewayResponse = new GatewayResponse(response);
         return ResponseEntity.ok(gatewayResponse);
@@ -51,7 +51,7 @@ public class GatewayController {
     public ResponseEntity<GatewayResponse> handleRequestToLeaningEndpoint(@RequestBody GatewayRequest gatewayRequest) throws IOException{
         logger.info("handleRequestToLeaningEndpoint is called and the following parameter is passed: " + gatewayRequest.getRequestForDataAnalysisService());
 
-        String response = dataAnalysisService.predictLeaning(gatewayRequest.getRequestForDataAnalysisService());
+        String response = dataAnalysisService.predictLeaning(gatewayRequest.getRequestForDataAnalysisService().replaceAll("\\p{Cntrl}", "").replaceAll("[^a-zA-Z0-9_ -]", ""));
 
         GatewayResponse gatewayResponse = new GatewayResponse(response);
         return ResponseEntity.ok(gatewayResponse);
@@ -61,7 +61,7 @@ public class GatewayController {
     public ResponseEntity<GatewayResponse> handleRequestToWorldCloudEndpoint(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToWorldCloudEndpoint is called and the following parameter is passed: " + gatewayRequest.getRequestForDataAnalysisService());
 
-        String response = dataAnalysisService.getWordCloud(gatewayRequest.getRequestForDataAnalysisService());
+        String response = dataAnalysisService.getWordCloud(gatewayRequest.getRequestForDataAnalysisService().replaceAll("\\p{Cntrl}", "").replaceAll("[^a-zA-Z0-9_ -]", ""));
 
         GatewayResponse gatewayResponse = new GatewayResponse(response);
         return ResponseEntity.ok(gatewayResponse);
