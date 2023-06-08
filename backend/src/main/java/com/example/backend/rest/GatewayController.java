@@ -11,7 +11,7 @@ import com.example.backend.service.DataAnalysisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +27,7 @@ public class GatewayController {
         this.dataAnalysisService = dataAnalysisService;
     }
 
-    @GetMapping(value = "/call-scraping-service", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/call-scraping-service", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToScrapingService(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToScrapingService is called and the following parameter is passed: " + gatewayRequest.getRequestForScrappingService());
 
@@ -37,7 +37,7 @@ public class GatewayController {
         return ResponseEntity.ok(gatewayResponse);
     }
 
-    @GetMapping(value = "/predict-tonality", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/predict-tonality", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToTonalityEndpoint(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToTonalityEndpoint is called and the following parameter is passed: " + gatewayRequest.getRequestForDataAnalysisService());
 
@@ -47,7 +47,7 @@ public class GatewayController {
         return ResponseEntity.ok(gatewayResponse);
     }
 
-    @GetMapping(value = "/predict-leaning", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/predict-leaning", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToLeaningEndpoint(@RequestBody GatewayRequest gatewayRequest) throws IOException{
         logger.info("handleRequestToLeaningEndpoint is called and the following parameter is passed: " + gatewayRequest.getRequestForDataAnalysisService());
 
@@ -57,7 +57,7 @@ public class GatewayController {
         return ResponseEntity.ok(gatewayResponse);
     }
 
-    @GetMapping(value = "/wordcloud", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/wordcloud", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToWorldCloudEndpoint(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToWorldCloudEndpoint is called and the following parameter is passed: " + gatewayRequest.getRequestForDataAnalysisService());
 
@@ -67,7 +67,7 @@ public class GatewayController {
         return ResponseEntity.ok(gatewayResponse);
     }
 
-    @GetMapping(value = "/scrape-article-and-predict-tonality", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/scrape-article-and-predict-tonality", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToScrapThenPredictTonality(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToScrapThenPredictTonality is called and the following parameter is passed: " + gatewayRequest.getRequestForScrappingService());
 
@@ -80,7 +80,7 @@ public class GatewayController {
         return ResponseEntity.ok(gatewayResponse);
     }
 
-    @GetMapping(value = "/scrape-article-and-predict-leaning", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/scrape-article-and-predict-leaning", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToScrapThenPredictLeaning(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToScrapThenPredictLeaning is called and the following parameter is passed: " + gatewayRequest.getRequestForScrappingService());
 
@@ -93,7 +93,7 @@ public class GatewayController {
         return ResponseEntity.ok(gatewayResponse);
     }
 
-    @GetMapping(value = "/scrape-article-and-get-wordcloud", consumes = {"application/json"}, produces = "application/json")
+    @PostMapping(value = "/scrape-article-and-get-wordcloud", consumes = {"application/json"}, produces = "application/json")
     public ResponseEntity<GatewayResponse> handleRequestToScrapThenGetWordcloud(@RequestBody GatewayRequest gatewayRequest) throws IOException {
         logger.info("handleRequestToScrapThenGetWordcloud is called and the following parameter is passed: " + gatewayRequest.getRequestForScrappingService());
 
