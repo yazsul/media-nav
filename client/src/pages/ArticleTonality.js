@@ -10,7 +10,7 @@ const ArticleTonality = () => {
   const [error, setError] = React.useState(null);
   const [data, setData] = React.useState(null);
   
-  const backendServerURL = 'http://localhost:8080';
+  const backendServerURL = 'http://medianav.sytes.net:54322';
 
   const transformObjectToArray = (obj) => {
     const result = [];
@@ -24,14 +24,14 @@ const ArticleTonality = () => {
   }
   
   
-  const sendToAPILink = async (data) => {
+  const sendToAPILink = async (input) => {
      axios({
       method: 'post',
       url: backendServerURL.concat('', '/scrape-article-and-predict-tonality'),
       headers:{
         'Content-Type': 'application/json',
       },
-      data: data
+      data: input
     }).then(response => {
       let res = response.data;
       const result = transformObjectToArray(res["probabilities"]);
@@ -39,14 +39,14 @@ const ArticleTonality = () => {
     })
   }
   
-  const sendToAPIText = async (data) => {
+  const sendToAPIText = async (input) => {
      axios({
       method: 'post',
       url: backendServerURL.concat('', '/predict-tonality'),
       headers:{
         'Content-Type': 'application/json',
       },
-      data: data
+      data: input
     }).then(response => {
       let res = response.data;
       const result = transformObjectToArray(res["probabilities"]);
@@ -61,11 +61,11 @@ const ArticleTonality = () => {
       if (isLink) {
         const value = event.target.link.value;
         yup.string().url('Invalid URL').required().validateSync(value);
-        await sendToAPILink({ link: value });
+        await sendToAPILink({ requestForScrappingService: value });
       } else {
         const value = event.target.text.value;
         yup.string().required().validateSync(value);
-        await sendToAPIText({ text: value });
+        await sendToAPIText({ requestForDataAnalysisService: value });
       }
     } catch (error) {
       setError(error.message);

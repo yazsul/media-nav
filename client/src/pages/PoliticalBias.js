@@ -8,7 +8,8 @@ const PoliticalBias = () => {
   const [isLink, setIsLink] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [data, setData] = React.useState(null);
-  const backendServerURL = 'http://localhost:8080';
+  
+  const backendServerURL = 'http://medianav.sytes.net:54322';
 
   
   const transformObjectToArray = (obj) => {
@@ -22,34 +23,50 @@ const PoliticalBias = () => {
     return result;
   }
   
-  const sendToAPILink = async (data) => {
-    axios({
+  const sendToAPILink = (input) => {
+    return axios.post(backendServerURL.concat('', '/scrape-article-and-predict-leaning'), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: input,
+    });
+    /*axios({
      method: 'post',
-     url: backendServerURL.concat(backendServerURL, '/scrape-article-and-predict-leaning'),
+     url: backendServerURL.concat('', '/scrape-article-and-predict-leaning'),
      headers:{
        'Content-Type': 'application/json',
      },
-     data: data
+     data: input
    }).then(response => {
-     let res = response.data;
+     let res = response;
+     console.log(res['data']);
+     console.log(res);
      const result = transformObjectToArray(res["probabilities"]);
      setData(result) ;
-   })
+   })*/
  }
  
- const sendToAPIText = async (data) => {
-    axios({
+ const sendToAPIText = (input) => {
+    return axios.post(backendServerURL.concat('', '/predict-leaning'), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: input,
+    });
+    /*axios({
      method: 'post',
-     url: backendServerURL.concat(backendServerURL, '/predict-leaning'),
+     url: backendServerURL.concat('', '/predict-leaning'),
      headers:{
        'Content-Type': 'application/json',
      },
-     data: data
+     data: input
    }).then(response => {
      let res = response.data;
+     console.log(res['data']);
+     console.log(res[0]);
      const result = transformObjectToArray(res["probabilities"]);
      setData(result) ;
-   })
+   })*/
  }
 
   const handleSubmit = async (event) => {
@@ -60,7 +77,10 @@ const PoliticalBias = () => {
         const value = event.target.link.value;
         yup.string().url('Invalid URL').required().validateSync(value);
         const response = await sendToAPILink({ requestForScrappingService: value });
-        setData(response);
+        let res = response;
+        console.log(res);
+        const result = transformObjectToArray(res);
+        setData(result);
       } else {
         const value = event.target.text.value;
         yup.string().required().validateSync(value);
