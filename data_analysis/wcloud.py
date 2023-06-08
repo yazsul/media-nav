@@ -70,7 +70,7 @@ class WordCloudImplementation:
 
         preprocessed_text = self.preprocess_text(text)
         wordcloud = WordCloud(background_color='white',
-                              width=3000, height=2000, max_words=500).generate(preprocessed_text)
+                              width=600, height=400, max_words=30).generate(preprocessed_text)
         return wordcloud
 
 
