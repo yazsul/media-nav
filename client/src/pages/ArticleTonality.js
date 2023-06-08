@@ -24,34 +24,46 @@ const ArticleTonality = () => {
   }
   
   
-  const sendToAPILink = async (input) => {
-     axios({
+  const sendToAPILink = (input) => {
+    /*return axios.post(backendServerURL.concat('', '/scrape-article-and-predict-tonality'), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: input,
+    });*/
+    return axios({
       method: 'post',
       url: backendServerURL.concat('', '/scrape-article-and-predict-tonality'),
       headers:{
         'Content-Type': 'application/json',
       },
       data: input
-    }).then(response => {
+    })/*.then(response => {
       let res = response.data;
       const result = transformObjectToArray(res["probabilities"]);
       setData(result) ;
-    })
+    })*/
   }
   
-  const sendToAPIText = async (input) => {
-     axios({
+  const sendToAPIText = (input) => {
+    /*return axios.post(backendServerURL.concat('', '/predict-tonality'), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: input,
+    });*/
+    return axios({
       method: 'post',
       url: backendServerURL.concat('', '/predict-tonality'),
       headers:{
         'Content-Type': 'application/json',
       },
       data: input
-    }).then(response => {
+    })/*.then(response => {
       let res = response.data;
       const result = transformObjectToArray(res["probabilities"]);
       setData(result) ;
-    })
+    })*/
   }
 
   const handleSubmit = async (event) => {
@@ -61,11 +73,19 @@ const ArticleTonality = () => {
       if (isLink) {
         const value = event.target.link.value;
         yup.string().url('Invalid URL').required().validateSync(value);
-        await sendToAPILink({ requestForScrappingService: value });
+        const response = await sendToAPILink({ requestForScrappingService: value });
+        let res = JSON.parse(response.data.response);
+        console.log(res);
+        const result = transformObjectToArray(res);
+        setData(result);
       } else {
         const value = event.target.text.value;
         yup.string().required().validateSync(value);
-        await sendToAPIText({ requestForDataAnalysisService: value });
+        const response = await sendToAPIText({ requestForDataAnalysisService: value });
+        let res = JSON.parse(response.data.response);
+        console.log(res);
+        const result = transformObjectToArray(res);
+        setData(result);
       }
     } catch (error) {
       setError(error.message);
@@ -73,6 +93,7 @@ const ArticleTonality = () => {
   };
 
   const inputs = useMemo(() => {
+    setData(null)
     if (isLink) {
       return (
         <>
